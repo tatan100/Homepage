@@ -12,6 +12,11 @@ A glassmorphism-styled dashboard for personal use. Displays real-time weather ba
 - Quick shortcuts grid
 - LocalStorage persistence
 
+## Usage
+- Type into the search bar and press Enter to search via Brave.
+- Click anywhere on a task card to open its link; click directly on the checkbox to toggle completion.
+- Use the shortcuts grid on the sidebar to quickly open frequently used sites.
+
 ## Tech Stack
 - Vanilla JavaScript
 - CSS3 (custom properties, glassmorphism)
@@ -24,6 +29,6 @@ A glassmorphism-styled dashboard for personal use. Displays real-time weather ba
 ├── css/
 │   └── style.css
 └── js/
-    ├── config.js      # Personal config (git-ignored)
+    ├── config.js
     └── script.js
 ```

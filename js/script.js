@@ -129,11 +129,15 @@ checks.forEach(box => {
 
 document.querySelectorAll('.task-item').forEach(item => {
     item.addEventListener('click', function (e) {
-        if (e.target.tagName === 'A' || e.target.tagName === 'INPUT') return;
-
-        const box = this.querySelector('input[type="checkbox"]');
-        box.checked = !box.checked;
-        save(box);
+        if (e.target.tagName === 'INPUT') {
+            e.stopPropagation();
+            return;
+        }
+        if (e.target.tagName === 'A') return;
+        const link = this.querySelector('.task-link');
+        if (link && link.href) {
+            window.open(link.href, '_blank');
+        }
     });
 });
 
