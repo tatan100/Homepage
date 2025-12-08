@@ -9,25 +9,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <link href="fonts/Font Awesome 7 Free-Solid.otf" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-    <div id="weather-bg"></div>
-    <div class="bg-icon icon-right weather-display">☁️</div>
-    <div class="bg-icon icon-left-bottom weather-display">☁️</div>
-    <div class="bg-icon icon-left-top weather-display">☁️</div>
-    <div class="rain-overlay" id="rainOverlay"></div>
-
     <div class="container">
         <div class="main-panel">
             <header>
-                <h1>airdrops: daily!</h1>
-                <div class="weather-info">
-                    <div class="weather-dot" id="weatherDot"></div>
-                    <span id="weatherText">Syncing...</span>
-                    <span class="separator">•</span>
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 1rem;">
+                    <h1 style="margin: 0;">airdrops: daily!</h1>
+                    <button id="btnAddTask" class="btn-add">+</button>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 6px;">
                     <span id="dateDisplay">...</span>
                 </div>
                 <div class="progress-container">
@@ -36,105 +32,7 @@
             </header>
 
             <div class="task-list-container">
-                <div class="task-list">
-
-                    <div class="task-item">
-                        <div class="task-left">
-                            <img src="https://www.google.com/s2/favicons?domain=airdrop.clashofgalaxies.com&sz=32"
-                                class="task-icon" alt="icon">
-                            <a href="https://airdrop.clashofgalaxies.com/" class="task-link">Nova: Clash
-                                of Galaxies</a>
-                        </div>
-                        <input type="checkbox" id="t1">
-                    </div>
-
-                    <div class="task-item">
-                        <div class="task-left">
-                            <img src="https://www.google.com/s2/favicons?domain=neuraknights.gg&sz=32" class="task-icon"
-                                alt="icon">
-                            <a href="https://www.neuraknights.gg/home" class="task-link">Neura
-                                Knights</a>
-                        </div>
-                        <input type="checkbox" id="t2">
-                    </div>
-
-                    <div class="task-item">
-                        <div class="task-left">
-                            <img src="https://pub-59b46f9218c04d978c727f08157a37a8.r2.dev/assets/crunchie-robot.png?v=2"
-                                class="task-icon" alt="icon">
-                            <a href="https://campaigns.datai.network/crunchie" class="task-link">Crunchie</a>
-                        </div>
-                        <input type="checkbox" id="t3">
-                    </div>
-
-                    <div class="task-item">
-                        <div class="task-left">
-                            <img src="https://images.snagsolutions.io/cdn-cgi/image/width=80/https://assets.snagsolutions.io/organizations/c798ad76-e2ba-4ed9-9798-4894facd2c2f/websites/8e54cfff-37f1-4d29-b025-8f8aaa1fd331/images/66cec95d-19c2-4acb-8e8e-1c37a630c4a6.png"
-                                class="task-icon" alt="icon">
-                            <a href="https://loyalty.usecorn.com/quest" class="task-link">Corn Loyalty
-                                Program</a>
-                        </div>
-                        <input type="checkbox" id="t4">
-                    </div>
-
-                    <div class="task-item">
-                        <div class="task-left">
-                            <img src="https://www.google.com/s2/favicons?domain=icarus.finance&sz=32" class="task-icon"
-                                alt="icon">
-                            <a href="https://www.icarus.finance/swap" class="task-link">Icarus
-                                Testnet</a>
-                        </div>
-                        <input type="checkbox" id="t5">
-                    </div>
-
-                    <div class="task-item">
-                        <div class="task-left">
-                            <img src="https://www.google.com/s2/favicons?domain=testnet.lifeai.io&sz=32"
-                                class="task-icon" alt="icon">
-                            <a href="https://testnet.lifeai.io/en/quests" class="task-link">LifeAI</a>
-                        </div>
-                        <input type="checkbox" id="t6">
-                    </div>
-
-                    <div class="task-item">
-                        <div class="task-left">
-                            <img src="https://www.google.com/s2/favicons?domain=rewards.canopynetwork.org&sz=32"
-                                class="task-icon" alt="icon">
-                            <a href="https://rewards.canopynetwork.org/" class="task-link">Canopy
-                                Network Quests</a>
-                        </div>
-                        <input type="checkbox" id="t7">
-                    </div>
-
-                    <div class="task-item">
-                        <div class="task-left">
-                            <img src="https://images.snagsolutions.io/cdn-cgi/image/width=80/https://assets.snagsolutions.io/organizations/9cbc4bcb-081d-4499-8b5f-77261171a383/websites/9c659eaa-a6ec-427e-a3a8-ed2cd222c8d8/images/62c707c1-40db-46cf-a22b-4103f8a34ded.png"
-                                class="task-icon" alt="icon">
-                            <a href="https://quests.yom.net/loyalty" class="task-link">YOM Loyalty
-                                Program</a>
-                        </div>
-                        <input type="checkbox" id="t8">
-                    </div>
-
-                    <div class="task-item">
-                        <div class="task-left">
-                            <img src="https://www.google.com/s2/favicons?domain=satsume.com&sz=32" class="task-icon"
-                                alt="icon">
-                            <a href="https://satsume.com/genesis" class="task-link">Satsume Protocol</a>
-                        </div>
-                        <input type="checkbox" id="t9">
-                    </div>
-
-                    <div class="task-item">
-                        <div class="task-left">
-                            <img src="https://www.google.com/s2/favicons?domain=crafts.dev&sz=32" class="task-icon"
-                                alt="icon">
-                            <a href="https://crafts.dev/explore" class="task-link">Crafts</a>
-                        </div>
-                        <input type="checkbox" id="t10">
-                    </div>
-
-                </div>
+                <div class="task-list" id="taskList"></div>
             </div>
 
             <div class="task-footer">
@@ -171,27 +69,75 @@
                         <p>Gmail</p>
                     </a>
                     <a href="https://x.com" class="shortcut">
-                        <img src="https://www.google.com/s2/favicons?domain=x.com&sz=64" alt="X">
+                        <img src="https://abs.twimg.com/favicons/twitter.3.ico" alt="X">
                         <p>X</p>
                     </a>
                     <a href="https://taskon.xyz/home" class="shortcut">
-                        <img src="https://www.google.com/s2/favicons?domain=taskon.xyz&sz=64" alt="TaskOn">
+                        <img src="https://taskon.xyz/favicon.png" alt="TaskOn">
                         <p>TaskOn</p>
                     </a>
                     <a href="https://app.galxe.com" class="shortcut">
-                        <img src="https://www.google.com/s2/favicons?domain=galxe.com&sz=64" alt="Galxe">
+                        <img src="https://framerusercontent.com/images/2S6TG0kYEyR3yjYzcrVMN62oZhk.png" alt="Galxe">
                         <p>Galxe</p>
                     </a>
                     <a href="https://debank.com" class="shortcut">
-                        <img src="https://www.google.com/s2/favicons?domain=debank.com&sz=64" alt="DeBank">
+                        <img src="https://assets.debank.com/favicon.ico" alt="DeBank">
                         <p>DeBank</p>
+                    </a>
+                    <a href="https://github.com/tatan100" class="shortcut">
+                        <img src="https://github.com/fluidicon.png" alt="GitHub">
+                        <p>GitHub</p>
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="js/config.js"></script>
+    <div class="modal-overlay" id="taskModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Add New Task</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label for="taskName">Task Name</label>
+                    <input type="text" id="taskName" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskUrl">URL</label>
+                    <input type="url" id="taskUrl" placeholder="https://" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskIcon">Icon URL (optional)</label>
+                    <input type="url" id="taskIcon" placeholder="Leave empty for auto-detection">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="btnCancel">Cancel</button>
+                    <button type="submit" class="btn-submit">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0GrHzgKBy6hp4yJagm-oBak3I0-UdyuA",
+            authDomain: "webhome-1b778.firebaseapp.com",
+            projectId: "webhome-1b778",
+            storageBucket: "webhome-1b778.firebasestorage.app",
+            messagingSenderId: "1034336329224",
+            appId: "1:1034336329224:web:4459f93d38f3d4ef16fbbd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+
+        window.db = getFirestore(app);
+        console.log('✅ Firebase initialized');
+    </script>
     <script src="js/script.js"></script>
 </body>
 

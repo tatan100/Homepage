@@ -1,34 +1,64 @@
-# Personal Dashboard
-Minimalist browser homepage with weather widget, clock, daily task tracker, and quick shortcuts.
+# My Chrome Homepage 🏠
 
-## Description
-A glassmorphism-styled dashboard for personal use. Displays real-time weather based on coordinates, shows contextual greetings, and tracks daily tasks with auto-reset at 7 AM.
+Personal browser homepage for tracking daily airdrops. Clean, simple, syncs across devices.
+
+![preview](assets/Preview.png)
 
 ## Features
-- Real-time weather with animated backgrounds
-- Clock with morning/afternoon/evening greetings
-- Daily task checklist (auto-resets at 7 AM)
-- Brave search integration
-- Quick shortcuts grid
-- LocalStorage persistence
+
+- ⏰ Clock with contextual greeting (Good morning/afternoon/evening)
+- ✅ Daily task tracker (auto-resets at 7 AM)
+- 🔍 Quick search (powered by Brave)
+- 🚀 Shortcut grid to your favorite platforms
+- ☁️ Real-time sync via Firebase Firestore
+
+## Setup
+
+This homepage is pure static HTML + Firebase. No installation needed:
+
+1. **Clone the repo**
+   ```
+   git clone https://github.com/tatan100/Homepage.git
+   ```
+
+2. **Setup Firebase** (free!)
+   - Create a project at [Firebase Console](https://console.firebase.google.com)
+   - Enable Firestore Database
+   - Copy the config to `index.html`
+   - Set up Security Rules (so only you can edit)
+
+3. **Deploy to GitHub Pages**
+   - Push to GitHub
+   - Settings → Pages → Deploy from main branch
+   - Done! ✨
+
+## File Structure
+
+```
+index.html      → Main page + Firebase config
+css/style.css   → Glassmorphism styling
+js/script.js    → Logic + Firebase integration
+fonts/          → Font Awesome 7 (for icons)
+assets/         → Preview screenshot
+```
 
 ## Usage
-- Type into the search bar and press Enter to search via Brave.
-- Click anywhere on a task card to open its link; click directly on the checkbox to toggle completion.
-- Use the shortcuts grid on the sidebar to quickly open frequently used sites.
+
+- **Add task:** Click the `+` button in the top-right
+- **Check task:** Click checkbox (auto-saves to Firebase)
+- **Delete task:** Click the 🗑️ icon
+- **Search:** Type in the search bar, hit Enter
+- **Shortcuts:** Just click them
+- **Reset tasks:** Auto-resets at 7 AM, or click "Uncheck everything"
 
 ## Tech Stack
-- Vanilla JavaScript
-- CSS3 (custom properties, glassmorphism)
-- Open-Meteo Weather API
 
-## Structure
-```
-.
-├── index.html
-├── css/
-│   └── style.css
-└── js/
-    ├── config.js
-    └── script.js
-```
+- Pure JavaScript (ES6 modules)
+- Firebase Firestore (cloud storage)
+- GitHub Pages (hosting)
+- localStorage (fallback when Firebase errors)
+
+---
+
+Built for tracking daily crypto airdrops 🪂  
+Made with 🩵 and ☕
