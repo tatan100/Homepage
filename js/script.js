@@ -12,7 +12,7 @@ function handleSearch(e) {
     if (e.key === 'Enter') {
         const query = searchInput.value.trim();
         if (query) {
-            window.open(SEARCH_URL + encodeURIComponent(query), '_blank');
+            window.location.href = SEARCH_URL + encodeURIComponent(query);
             searchInput.value = '';
         }
     }
@@ -136,7 +136,7 @@ document.querySelectorAll('.task-item').forEach(item => {
         if (e.target.tagName === 'A') return;
         const link = this.querySelector('.task-link');
         if (link && link.href) {
-            window.open(link.href, '_blank');
+            link.click();
         }
     });
 });
