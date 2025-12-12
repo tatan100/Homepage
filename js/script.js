@@ -83,8 +83,12 @@ const modalOverlay = document.getElementById("taskModalOverlay");
 const taskForm = document.getElementById("taskForm");
 const modalClose = document.getElementById("modalClose");
 const btnCancel = document.getElementById("btnCancel");
+const contextMenu = document.getElementById("contextMenu");
+const menuEdit = document.getElementById("menuEdit");
+const menuDelete = document.getElementById("menuDelete");
 
 let tasks = [];
+let currentTaskRightClicked = null;
 const TASKS_DOC = "user-tasks";
 
 async function loadTasks() {
@@ -92,29 +96,20 @@ async function loadTasks() {
     const docRef = doc(db, "homepage", TASKS_DOC);
     let isFirstLoad = true;
 
-    onSnapshot(
-      docRef,
-      (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          tasks = data.tasks || [];
-          console.log("Tasks loaded from Firebase:", tasks.length);
-        } else {
-          console.log("No tasks found in Firebase, starting empty.");
-          tasks = [];
-        }
-        renderTasks();
+    onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        tasks = data.tasks || [];
+      } else {
+        tasks = [];
+      }
+      renderTasks();
 
-        if (isFirstLoad) {
-          checkAutoReset();
-          isFirstLoad = false;
-        }
-      },
-      (error) => {
-        console.error("Firestore Error (likely permission):", error.code);
-        loadTasksFromLocalStorage();
-      },
-    );
+      if (isFirstLoad) {
+        checkAutoReset();
+        isFirstLoad = false;
+      }
+    });
   } catch (e) {
     console.error("Failed to setup listener:", e);
     loadTasksFromLocalStorage();
@@ -123,36 +118,24 @@ async function loadTasks() {
 
 function loadTasksFromLocalStorage() {
   const saved = localStorage.getItem("homepage-tasks");
-  if (saved) {
-    try {
-      tasks = JSON.parse(saved);
-      console.log("Tasks loaded from localStorage (fallback)");
-    } catch (e) {
-      tasks = [];
-    }
-  } else {
-    tasks = [];
-  }
+  tasks = saved ? JSON.parse(saved) : [];
   renderTasks();
 }
 
 async function saveTasks() {
   if (!auth.currentUser) {
-    console.warn("User not logged in, saving to LocalStorage only.");
     saveTasksToLocalStorage();
     return;
   }
-
   try {
     const docRef = doc(db, "homepage", TASKS_DOC);
     await setDoc(docRef, {
       tasks: tasks,
       lastUpdated: new Date().toISOString(),
     });
-    console.log("Tasks saved to Firebase");
     saveTasksToLocalStorage();
   } catch (e) {
-    console.error("Failed to save tasks to Firebase:", e);
+    console.error("Failed to save:", e);
     saveTasksToLocalStorage();
     renderTasks();
   }
@@ -175,29 +158,66 @@ function renderTasks() {
             </div>
             <div class="task-actions">
                 <input type="checkbox" ${task.checked ? "checked" : ""}>
-                <button class="btn-delete" data-id="${task.id}" aria-label="Delete task">🗑️</button>
             </div>
         `;
+
     item.addEventListener("click", (e) => {
-      if (e.target.tagName === "INPUT" || e.target.tagName === "BUTTON") return;
+      if (e.target.tagName === "INPUT") return;
       if (e.target.tagName === "A") return;
       const link = item.querySelector(".task-link");
       if (link && link.href) link.click();
     });
+
     const checkbox = item.querySelector('input[type="checkbox"]');
     checkbox.addEventListener("change", () => {
       task.checked = checkbox.checked;
       saveTasks();
     });
-    const deleteBtn = item.querySelector(".btn-delete");
-    deleteBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (confirm(`Delete task "${task.name}"?`)) deleteTask(task.id);
+
+    item.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      showContextMenu(e, task);
     });
+
     taskListEl.appendChild(item);
   });
   updateProgressBar();
 }
+
+function showContextMenu(e, task) {
+  currentTaskRightClicked = task;
+
+  contextMenu.style.left = `${e.pageX}px`;
+  contextMenu.style.top = `${e.pageY}px`;
+  contextMenu.classList.add("active");
+}
+
+function hideContextMenu() {
+  contextMenu.classList.remove("active");
+  currentTaskRightClicked = null;
+}
+
+document.addEventListener("click", (e) => {
+  if (!contextMenu.contains(e.target)) {
+    hideContextMenu();
+  }
+});
+
+menuDelete.addEventListener("click", () => {
+  if (currentTaskRightClicked) {
+    if (confirm(`Delete "${currentTaskRightClicked.name}"?`)) {
+      deleteTask(currentTaskRightClicked.id);
+    }
+  }
+  hideContextMenu();
+});
+
+menuEdit.addEventListener("click", () => {
+  if (currentTaskRightClicked) {
+    openEditModal(currentTaskRightClicked);
+  }
+  hideContextMenu();
+});
 
 function updateProgressBar() {
   if (!bar) return;
@@ -206,19 +226,42 @@ function updateProgressBar() {
   bar.style.width = total === 0 ? "0%" : (done / total) * 100 + "%";
 }
 
+let isEditing = false;
+let editingTaskId = null;
+
 if (taskForm) {
-  function showModal() {
+  function showModal(isEditMode = false) {
     modalOverlay.classList.add("active");
+    const title = document.querySelector(".modal-header h2");
+    const submitBtn = document.querySelector(".btn-submit");
+
+    if (isEditMode) {
+      title.innerText = "Edit Task";
+      submitBtn.innerText = "Save Changes";
+      isEditing = true;
+    } else {
+      title.innerText = "Add New Task";
+      submitBtn.innerText = "Add Task";
+      taskForm.reset();
+      isEditing = false;
+      editingTaskId = null;
+    }
     document.getElementById("taskName").focus();
+  }
+
+  function openEditModal(task) {
+    document.getElementById("taskName").value = task.name;
+    document.getElementById("taskUrl").value = task.url;
+    document.getElementById("taskIcon").value = task.icon || "";
+    editingTaskId = task.id;
+    showModal(true);
   }
 
   function hideModal() {
     modalOverlay.classList.remove("active");
     taskForm.reset();
-  }
-
-  function addNewTask() {
-    showModal();
+    isEditing = false;
+    editingTaskId = null;
   }
 
   taskForm.addEventListener("submit", (e) => {
@@ -226,7 +269,9 @@ if (taskForm) {
     const name = document.getElementById("taskName").value.trim();
     const url = document.getElementById("taskUrl").value.trim();
     const iconUrl = document.getElementById("taskIcon").value.trim();
+
     if (!name || !url) return;
+
     let domain = "";
     try {
       domain = new URL(url).hostname;
@@ -235,15 +280,26 @@ if (taskForm) {
     }
     const icon =
       iconUrl || `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-    const newTask = {
-      id: Date.now().toString(),
-      name,
-      url,
-      icon,
-      checked: false,
-    };
-    tasks.push(newTask);
-    saveTasks();
+
+    if (isEditing && editingTaskId) {
+      const taskIndex = tasks.findIndex((t) => t.id === editingTaskId);
+      if (taskIndex > -1) {
+        tasks[taskIndex].name = name;
+        tasks[taskIndex].url = url;
+        tasks[taskIndex].icon = icon;
+        saveTasks();
+      }
+    } else {
+      const newTask = {
+        id: Date.now().toString(),
+        name,
+        url,
+        icon,
+        checked: false,
+      };
+      tasks.push(newTask);
+      saveTasks();
+    }
     hideModal();
   });
 
@@ -255,7 +311,7 @@ if (taskForm) {
     });
 
   if (btnAdd) {
-    btnAdd.addEventListener("click", addNewTask);
+    btnAdd.addEventListener("click", () => showModal(false));
   }
 }
 
@@ -280,7 +336,6 @@ function checkAutoReset() {
   if (now < target) target.setDate(target.getDate() - 1);
   const lastTime = last ? new Date(last) : new Date(0);
   if (lastTime < target) {
-    console.log("Auto resetting tasks...");
     window.manualReset(false);
     localStorage.setItem("lastResetDate", now.toISOString());
   }
@@ -293,13 +348,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      console.log("✅ User logged in:", user.email);
       await loadTasks();
     } else {
-      console.log("⚠️ User NOT logged in. Showing local data only.");
-      console.log(
-        "👉 Run 'await window.signInWithPopup(window.auth, window.provider)' in console to login.",
-      );
       loadTasksFromLocalStorage();
     }
   });

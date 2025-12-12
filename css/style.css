@@ -570,3 +570,58 @@ input[type="checkbox"]:checked::after {
 .btn-delete:hover {
   transform: scale(1.1);
 }
+
+.context-menu {
+  display: none;
+  position: absolute;
+  z-index: 10000;
+  width: 150px;
+  background: #2b2d31;
+  border: 1px solid #1e1f22;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  overflow: hidden;
+}
+
+.context-menu.active {
+  display: block;
+  animation: fadeIn 0.1s ease-out;
+}
+
+.menu-item {
+  padding: 8px 12px;
+  color: #dbdee1;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-item:hover {
+  background: #404249;
+  color: #fff;
+}
+
+.menu-item.delete:hover {
+  background: #da373c;
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.task-actions .btn-delete {
+  display: none;
+}
