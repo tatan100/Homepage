@@ -32,9 +32,25 @@ window.auth = auth;
 window.provider = provider;
 window.signInWithPopup = signInWithPopup;
 
-const SEARCH_URL = "https://search.brave.com/search?q=";
+const taskListEl = document.getElementById("taskList");
+const bar = document.getElementById("progressBar");
+const btnAdd = document.getElementById("btnAddTask");
+const modalOverlay = document.getElementById("taskModalOverlay");
+const taskForm = document.getElementById("taskForm");
+const modalClose = document.getElementById("modalClose");
+const btnCancel = document.getElementById("btnCancel");
+const contextMenu = document.getElementById("contextMenu");
+const menuEdit = document.getElementById("menuEdit");
+const menuDelete = document.getElementById("menuDelete");
 const searchInput = document.getElementById("searchInput");
 
+let tasks = [];
+let currentTaskRightClicked = null;
+let isEditing = false;
+let editingTaskId = null;
+const TASKS_DOC = "user-tasks";
+
+const SEARCH_URL = "https://search.brave.com/search?q=";
 if (searchInput) {
   searchInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
@@ -50,7 +66,6 @@ if (searchInput) {
 function updateClock() {
   const clockEl = document.getElementById("clock");
   if (!clockEl) return;
-
   const now = new Date();
   let h = now.getHours();
   const m = now.getMinutes();
@@ -76,30 +91,15 @@ function updateClock() {
   );
 }
 
-const taskListEl = document.getElementById("taskList");
-const bar = document.getElementById("progressBar");
-const btnAdd = document.getElementById("btnAddTask");
-const modalOverlay = document.getElementById("taskModalOverlay");
-const taskForm = document.getElementById("taskForm");
-const modalClose = document.getElementById("modalClose");
-const btnCancel = document.getElementById("btnCancel");
-const contextMenu = document.getElementById("contextMenu");
-const menuEdit = document.getElementById("menuEdit");
-const menuDelete = document.getElementById("menuDelete");
-
-let tasks = [];
-let currentTaskRightClicked = null;
-const TASKS_DOC = "user-tasks";
-
 async function loadTasks() {
   try {
     const docRef = doc(db, "homepage", TASKS_DOC);
     let isFirstLoad = true;
-
     onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         tasks = data.tasks || [];
+        console.log("Tasks loaded from Firebase:", tasks.length);
       } else {
         tasks = [];
       }
@@ -123,21 +123,19 @@ function loadTasksFromLocalStorage() {
 }
 
 async function saveTasks() {
-  if (!auth.currentUser) {
-    saveTasksToLocalStorage();
-    return;
-  }
+  renderTasks();
+  saveTasksToLocalStorage();
+
+  if (!auth.currentUser) return;
   try {
     const docRef = doc(db, "homepage", TASKS_DOC);
     await setDoc(docRef, {
       tasks: tasks,
       lastUpdated: new Date().toISOString(),
     });
-    saveTasksToLocalStorage();
+    console.log("Synced to Firebase");
   } catch (e) {
-    console.error("Failed to save:", e);
-    saveTasksToLocalStorage();
-    renderTasks();
+    console.error("Sync failed:", e);
   }
 }
 
@@ -162,7 +160,7 @@ function renderTasks() {
         `;
 
     item.addEventListener("click", (e) => {
-      if (e.target.tagName === "INPUT") return;
+      if (e.target.tagName === "INPUT" || e.target.tagName === "BUTTON") return;
       if (e.target.tagName === "A") return;
       const link = item.querySelector(".task-link");
       if (link && link.href) link.click();
@@ -184,9 +182,20 @@ function renderTasks() {
   updateProgressBar();
 }
 
+function updateProgressBar() {
+  if (!bar) return;
+  const total = tasks.length;
+  const done = tasks.filter((t) => t.checked).length;
+  bar.style.width = total === 0 ? "0%" : (done / total) * 100 + "%";
+}
+
+function deleteTask(idToDelete) {
+  tasks = tasks.filter((task) => task.id !== idToDelete);
+  saveTasks();
+}
+
 function showContextMenu(e, task) {
   currentTaskRightClicked = task;
-
   contextMenu.style.left = `${e.pageX}px`;
   contextMenu.style.top = `${e.pageY}px`;
   contextMenu.classList.add("active");
@@ -198,72 +207,66 @@ function hideContextMenu() {
 }
 
 document.addEventListener("click", (e) => {
-  if (!contextMenu.contains(e.target)) {
+  if (contextMenu && !contextMenu.contains(e.target)) {
     hideContextMenu();
   }
 });
 
-menuDelete.addEventListener("click", () => {
-  if (currentTaskRightClicked) {
-    if (confirm(`Delete "${currentTaskRightClicked.name}"?`)) {
-      deleteTask(currentTaskRightClicked.id);
+if (menuDelete) {
+  menuDelete.addEventListener("click", () => {
+    if (currentTaskRightClicked) {
+      if (confirm(`Delete "${currentTaskRightClicked.name}"?`)) {
+        deleteTask(currentTaskRightClicked.id);
+      }
     }
-  }
-  hideContextMenu();
-});
-
-menuEdit.addEventListener("click", () => {
-  if (currentTaskRightClicked) {
-    openEditModal(currentTaskRightClicked);
-  }
-  hideContextMenu();
-});
-
-function updateProgressBar() {
-  if (!bar) return;
-  const total = tasks.length;
-  const done = tasks.filter((t) => t.checked).length;
-  bar.style.width = total === 0 ? "0%" : (done / total) * 100 + "%";
+    hideContextMenu();
+  });
 }
 
-let isEditing = false;
-let editingTaskId = null;
-
-if (taskForm) {
-  function showModal(isEditMode = false) {
-    modalOverlay.classList.add("active");
-    const title = document.querySelector(".modal-header h2");
-    const submitBtn = document.querySelector(".btn-submit");
-
-    if (isEditMode) {
-      title.innerText = "Edit Task";
-      submitBtn.innerText = "Save Changes";
-      isEditing = true;
-    } else {
-      title.innerText = "Add New Task";
-      submitBtn.innerText = "Add Task";
-      taskForm.reset();
-      isEditing = false;
-      editingTaskId = null;
+if (menuEdit) {
+  menuEdit.addEventListener("click", () => {
+    if (currentTaskRightClicked) {
+      openEditModal(currentTaskRightClicked);
     }
-    document.getElementById("taskName").focus();
-  }
+    hideContextMenu();
+  });
+}
 
-  function openEditModal(task) {
-    document.getElementById("taskName").value = task.name;
-    document.getElementById("taskUrl").value = task.url;
-    document.getElementById("taskIcon").value = task.icon || "";
-    editingTaskId = task.id;
-    showModal(true);
-  }
+function showModal(isEditMode = false) {
+  modalOverlay.classList.add("active");
+  const title = document.querySelector(".modal-header h2");
+  const submitBtn = document.querySelector(".btn-submit");
 
-  function hideModal() {
-    modalOverlay.classList.remove("active");
+  if (isEditMode) {
+    title.innerText = "Edit Task";
+    submitBtn.innerText = "Save Changes";
+    isEditing = true;
+  } else {
+    title.innerText = "Add New Task";
+    submitBtn.innerText = "Add Task";
     taskForm.reset();
     isEditing = false;
     editingTaskId = null;
   }
+  document.getElementById("taskName").focus();
+}
 
+function openEditModal(task) {
+  document.getElementById("taskName").value = task.name;
+  document.getElementById("taskUrl").value = task.url;
+  document.getElementById("taskIcon").value = task.icon || "";
+  editingTaskId = task.id;
+  showModal(true);
+}
+
+function hideModal() {
+  modalOverlay.classList.remove("active");
+  taskForm.reset();
+  isEditing = false;
+  editingTaskId = null;
+}
+
+if (taskForm) {
   taskForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const name = document.getElementById("taskName").value.trim();
@@ -309,15 +312,7 @@ if (taskForm) {
     modalOverlay.addEventListener("click", (e) => {
       if (e.target === modalOverlay) hideModal();
     });
-
-  if (btnAdd) {
-    btnAdd.addEventListener("click", () => showModal(false));
-  }
-}
-
-function deleteTask(idToDelete) {
-  tasks = tasks.filter((task) => task.id !== idToDelete);
-  saveTasks();
+  if (btnAdd) btnAdd.addEventListener("click", () => showModal(false));
 }
 
 window.manualReset = function (showConfirm = true) {
@@ -336,6 +331,7 @@ function checkAutoReset() {
   if (now < target) target.setDate(target.getDate() - 1);
   const lastTime = last ? new Date(last) : new Date(0);
   if (lastTime < target) {
+    console.log("Auto resetting tasks...");
     window.manualReset(false);
     localStorage.setItem("lastResetDate", now.toISOString());
   }
@@ -348,6 +344,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
+      console.log("✅ User logged in:", user.email);
       await loadTasks();
     } else {
       loadTasksFromLocalStorage();
