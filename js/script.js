@@ -27,10 +27,16 @@ function updateClock() {
     if (h24 >= 5 && h24 < 12) greet = "Good morning!";
     else if (h24 >= 12 && h24 < 18) greet = "Good afternoon!";
     document.getElementById('greeting').innerText = greet;
+    
     document.getElementById('dateDisplay').innerText = now.toLocaleDateString('en-US', {
-        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric',
+        timeZone: 'Asia/Jakarta'
     });
 }
+
 
 const taskListEl = document.getElementById('taskList');
 const bar = document.getElementById('progressBar');
