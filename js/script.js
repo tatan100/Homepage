@@ -4,6 +4,7 @@ import {
   setDoc,
   onSnapshot,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
 const SEARCH_URL = "https://search.brave.com/search?q=";
 const searchInput = document.getElementById("searchInput");
@@ -32,7 +33,6 @@ function updateClock() {
   if (h24 >= 5 && h24 < 12) greet = "Good morning!";
   else if (h24 >= 12 && h24 < 18) greet = "Good afternoon!";
   document.getElementById("greeting").innerText = greet;
-
   document.getElementById("dateDisplay").innerText = now.toLocaleDateString(
     "en-US",
     {
@@ -62,10 +62,8 @@ async function loadTasks() {
       console.error("Firebase not initialized");
       return;
     }
-
     const docRef = doc(window.db, "homepage", TASKS_DOC);
     let isFirstLoad = true;
-
     onSnapshot(
       docRef,
       (docSnap) => {
@@ -78,7 +76,6 @@ async function loadTasks() {
           tasks = [];
         }
         renderTasks();
-
         if (isFirstLoad) {
           checkAutoReset();
           isFirstLoad = false;
@@ -117,7 +114,6 @@ async function saveTasks() {
       saveTasksToLocalStorage();
       return;
     }
-
     const docRef = doc(window.db, "homepage", TASKS_DOC);
     await setDoc(docRef, {
       tasks: tasks,
@@ -247,11 +243,8 @@ function checkAutoReset() {
   const now = new Date();
   const target = new Date(now);
   target.setHours(7, 0, 0, 0);
-
   if (now < target) target.setDate(target.getDate() - 1);
-
   const lastTime = last ? new Date(last) : new Date(0);
-
   if (lastTime < target) {
     console.log("Auto resetting tasks...");
     window.manualReset(false);
@@ -260,11 +253,26 @@ function checkAutoReset() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  setTimeout(async () => {
-    await loadTasks();
-    setInterval(checkAutoReset, 60000);
-
+  setTimeout(() => {
     updateClock();
     setInterval(updateClock, 1000);
+    setInterval(checkAutoReset, 60000);
+
+    if (window.auth) {
+      onAuthStateChanged(window.auth, async (user) => {
+        if (user) {
+          console.log("User logged in:", user.email);
+          await loadTasks();
+        } else {
+          console.log("User not logged in. Prompting sign in...");
+          try {
+            await window.signInWithPopup(window.auth, window.provider);
+          } catch (error) {
+            console.error("Login failed", error);
+            alert("Authentication required to save data.");
+          }
+        }
+      });
+    }
   }, 500);
 });

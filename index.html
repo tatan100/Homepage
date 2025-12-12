@@ -156,21 +156,23 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
       import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+      import {
+        getAuth,
+        GoogleAuthProvider,
+        signInWithPopup,
+      } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyB0GrHzgKBy6hp4yJagm-oBak3I0-UdyuA",
-        authDomain: "webhome-1b778.firebaseapp.com",
-        projectId: "webhome-1b778",
-        storageBucket: "webhome-1b778.firebasestorage.app",
-        messagingSenderId: "1034336329224",
-        appId: "1:1034336329224:web:4459f93d38f3d4ef16fbbd",
       };
 
       const app = initializeApp(firebaseConfig);
-
       window.db = getFirestore(app);
-      console.log("✅ Firebase initialized");
+      window.auth = getAuth(app);
+      window.provider = new GoogleAuthProvider();
+      window.signInWithPopup = signInWithPopup;
     </script>
+
     <script type="module" src="js/script.js"></script>
   </body>
 </html>
