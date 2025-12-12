@@ -1,144 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chrome: $HOME</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link href="fonts/Font Awesome 7 Free-Solid.otf" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-</head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link href="fonts/Font Awesome 7 Free-Solid.otf" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
 
-<body>
-
+  <body>
     <div class="container">
-        <div class="main-panel">
-            <header>
-                <div
-                    style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 1rem;">
-                    <h1 style="margin: 0;">airdrops: daily!</h1>
-                    <button id="btnAddTask" class="btn-add">+</button>
-                </div>
-                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 6px;">
-                    <span id="dateDisplay">...</span>
-                </div>
-                <div class="progress-container">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
-            </header>
+      <div class="main-panel">
+        <header>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              width: 100%;
+              margin-bottom: 1rem;
+            "
+          >
+            <h1 style="margin: 0">airdrops: daily!</h1>
+            <button id="btnAddTask" class="btn-add">+</button>
+          </div>
+          <div
+            style="
+              color: var(--text-secondary);
+              font-size: 0.85rem;
+              margin-top: 6px;
+            "
+          >
+            <span id="dateDisplay">...</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </header>
 
-            <div class="task-list-container">
-                <div class="task-list" id="taskList"></div>
-            </div>
-
-            <div class="task-footer">
-                <button class="btn-reset" onclick="manualReset()">Uncheck everything</button>
-                <div class="footer-info">*refreshed every 7 AM UTC+7</div>
-            </div>
+        <div class="task-list-container">
+          <div class="task-list" id="taskList"></div>
         </div>
 
-        <div class="sidebar">
-            <div class="widget search-widget">
-                <div class="search-wrapper">
-                    <svg class="search-icon" viewBox="0 0 24 24">
-                        <path
-                            d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-                    </svg>
-                    <input type="text" class="search-input" id="searchInput" placeholder="Find something..."
-                        onkeypress="handleSearch(event)">
-                </div>
-            </div>
-
-            <div class="widget clock-widget">
-                <div class="greeting" id="greeting">System Online</div>
-                <div class="time-container">
-                    <div class="time" id="clock">00:00</div>
-                    <div class="ampm" id="ampm">AM</div>
-                </div>
-            </div>
-
-            <div class="widget">
-                <h3 class="widget-title">Shortcuts</h3>
-                <div class="shortcuts-grid">
-                    <a href="https://mail.google.com" class="shortcut">
-                        <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="Gmail">
-                        <p>Gmail</p>
-                    </a>
-                    <a href="https://x.com" class="shortcut">
-                        <img src="https://abs.twimg.com/favicons/twitter.3.ico" alt="X">
-                        <p>X</p>
-                    </a>
-                    <a href="https://taskon.xyz/home" class="shortcut">
-                        <img src="https://taskon.xyz/favicon.png" alt="TaskOn">
-                        <p>TaskOn</p>
-                    </a>
-                    <a href="https://app.galxe.com" class="shortcut">
-                        <img src="https://framerusercontent.com/images/2S6TG0kYEyR3yjYzcrVMN62oZhk.png" alt="Galxe">
-                        <p>Galxe</p>
-                    </a>
-                    <a href="https://debank.com" class="shortcut">
-                        <img src="https://assets.debank.com/favicon.ico" alt="DeBank">
-                        <p>DeBank</p>
-                    </a>
-                    <a href="https://github.com/tatan100" class="shortcut">
-                        <img src="https://github.com/fluidicon.png" alt="GitHub">
-                        <p>GitHub</p>
-                    </a>
-                </div>
-            </div>
+        <div class="task-footer">
+          <button class="btn-reset" onclick="manualReset()">
+            Uncheck everything
+          </button>
+          <div class="footer-info">*refreshed every 7 AM UTC+7</div>
         </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="widget search-widget">
+          <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24">
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+            <input
+              type="text"
+              class="search-input"
+              id="searchInput"
+              placeholder="Find something..."
+              onkeypress="handleSearch(event)"
+            />
+          </div>
+        </div>
+
+        <div class="widget clock-widget">
+          <div class="greeting" id="greeting">System Online</div>
+          <div class="time-container">
+            <div class="time" id="clock">00:00</div>
+            <div class="ampm" id="ampm">AM</div>
+          </div>
+        </div>
+
+        <div class="widget">
+          <h3 class="widget-title">Shortcuts</h3>
+          <div class="shortcuts-grid">
+            <a href="https://mail.google.com" class="shortcut">
+              <img
+                src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"
+                alt="Gmail"
+              />
+              <p>Gmail</p>
+            </a>
+            <a href="https://x.com" class="shortcut">
+              <img src="https://abs.twimg.com/favicons/twitter.3.ico" alt="X" />
+              <p>X</p>
+            </a>
+            <a href="https://taskon.xyz/home" class="shortcut">
+              <img src="https://taskon.xyz/favicon.png" alt="TaskOn" />
+              <p>TaskOn</p>
+            </a>
+            <a href="https://app.galxe.com" class="shortcut">
+              <img
+                src="https://framerusercontent.com/images/2S6TG0kYEyR3yjYzcrVMN62oZhk.png"
+                alt="Galxe"
+              />
+              <p>Galxe</p>
+            </a>
+            <a href="https://debank.com" class="shortcut">
+              <img src="https://assets.debank.com/favicon.ico" alt="DeBank" />
+              <p>DeBank</p>
+            </a>
+            <a href="https://github.com/tatan100" class="shortcut">
+              <img src="https://github.com/fluidicon.png" alt="GitHub" />
+              <p>GitHub</p>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="modal-overlay" id="taskModalOverlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Add New Task</h2>
-                <button class="modal-close" id="modalClose">&times;</button>
-            </div>
-            <form id="taskForm">
-                <div class="form-group">
-                    <label for="taskName">Task Name</label>
-                    <input type="text" id="taskName" required>
-                </div>
-                <div class="form-group">
-                    <label for="taskUrl">URL</label>
-                    <input type="url" id="taskUrl" placeholder="https://" required>
-                </div>
-                <div class="form-group">
-                    <label for="taskIcon">Icon URL (optional)</label>
-                    <input type="url" id="taskIcon" placeholder="Leave empty for auto-detection">
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="btnCancel">Cancel</button>
-                    <button type="submit" class="btn-submit">Add Task</button>
-                </div>
-            </form>
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Add New Task</h2>
+          <button class="modal-close" id="modalClose">&times;</button>
         </div>
+        <form id="taskForm">
+          <div class="form-group">
+            <label for="taskName">Task Name</label>
+            <input type="text" id="taskName" required />
+          </div>
+          <div class="form-group">
+            <label for="taskUrl">URL</label>
+            <input type="url" id="taskUrl" placeholder="https://" required />
+          </div>
+          <div class="form-group">
+            <label for="taskIcon">Icon URL (optional)</label>
+            <input
+              type="url"
+              id="taskIcon"
+              placeholder="Leave empty for auto-detection"
+            />
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" id="btnCancel">
+              Cancel
+            </button>
+            <button type="submit" class="btn-submit">Add Task</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+      import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyB0GrHzgKBy6hp4yJagm-oBak3I0-UdyuA",
-            authDomain: "webhome-1b778.firebaseapp.com",
-            projectId: "webhome-1b778",
-            storageBucket: "webhome-1b778.firebasestorage.app",
-            messagingSenderId: "1034336329224",
-            appId: "1:1034336329224:web:4459f93d38f3d4ef16fbbd"
-        };
+      const firebaseConfig = {
+        apiKey: "AIzaSyB0GrHzgKBy6hp4yJagm-oBak3I0-UdyuA",
+        authDomain: "webhome-1b778.firebaseapp.com",
+        projectId: "webhome-1b778",
+        storageBucket: "webhome-1b778.firebasestorage.app",
+        messagingSenderId: "1034336329224",
+        appId: "1:1034336329224:web:4459f93d38f3d4ef16fbbd",
+      };
 
-        const app = initializeApp(firebaseConfig);
+      const app = initializeApp(firebaseConfig);
 
-        window.db = getFirestore(app);
-        console.log('✅ Firebase initialized');
+      window.db = getFirestore(app);
+      console.log("✅ Firebase initialized");
     </script>
     <script type="module" src="js/script.js"></script>
-</body>
-
+  </body>
 </html>
