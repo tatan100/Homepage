@@ -126,6 +126,7 @@ function renderTasks() {
   tasks.forEach((task) => {
     const item = document.createElement("div");
     item.className = `task-item ${task.checked ? "done" : ""}`;
+    item.setAttribute("data-id", task.id);
     item.innerHTML = `
             <div class="task-left">
                 <img src="${task.icon}" class="task-icon" onerror="this.src='https://www.google.com/s2/favicons?domain=example.com&sz=32'">
@@ -314,6 +315,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (e.target === modalOverlay) hideModal();
       });
     if (btnAdd) btnAdd.addEventListener("click", () => showModal(false));
+  }
+
+  if (taskListEl && typeof Sortable !== "undefined") {
+    new Sortable(taskListEl, {
+      animation: 150,
+      ghostClass: "sortable-ghost",
+      onEnd: function (evt) {
+        const itemEls = taskListEl.querySelectorAll(".task-item");
+        const newOrderIds = Array.from(itemEls).map((el) =>
+          el.getAttribute("data-id"),
+        );
+        const reorderedTasks = newOrderIds
+          .map((id) => tasks.find((t) => t.id === id))
+          .filter((t) => t !== undefined);
+        tasks = reorderedTasks;
+        saveTasks();
+      },
+    });
   }
 
   onAuthStateChanged(auth, async (user) => {
