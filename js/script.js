@@ -1,32 +1,63 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {
+  getFirestore,
   doc,
   getDoc,
   setDoc,
   onSnapshot,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB0GrHzgKBy6hp4yJagm-oBak3I0-UdyuA",
+  authDomain: "webhome-1b778.firebaseapp.com",
+  projectId: "webhome-1b778",
+  storageBucket: "webhome-1b778.firebasestorage.app",
+  messagingSenderId: "1034336329224",
+  appId: "1:1034336329224:web:4459f93d38f3d4ef16fbbd",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+window.db = db;
+window.auth = auth;
+window.provider = provider;
+window.signInWithPopup = signInWithPopup;
 
 const SEARCH_URL = "https://search.brave.com/search?q=";
 const searchInput = document.getElementById("searchInput");
 
-searchInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    const query = searchInput.value.trim();
-    if (query) {
-      window.location.href = SEARCH_URL + encodeURIComponent(query);
-      searchInput.value = "";
+if (searchInput) {
+  searchInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      const query = searchInput.value.trim();
+      if (query) {
+        window.location.href = SEARCH_URL + encodeURIComponent(query);
+        searchInput.value = "";
+      }
     }
-  }
-});
+  });
+}
 
 function updateClock() {
+  const clockEl = document.getElementById("clock");
+  if (!clockEl) return;
+
   const now = new Date();
   let h = now.getHours();
   const m = now.getMinutes();
   const ampm = h >= 12 ? "PM" : "AM";
   h = h % 12;
   h = h ? h : 12;
-  document.getElementById("clock").innerText = `${h}:${m < 10 ? "0" + m : m}`;
+  clockEl.innerText = `${h}:${m < 10 ? "0" + m : m}`;
   document.getElementById("ampm").innerText = ampm;
   const h24 = now.getHours();
   let greet = "Good evening!";
@@ -58,12 +89,9 @@ const TASKS_DOC = "user-tasks";
 
 async function loadTasks() {
   try {
-    if (!window.db) {
-      console.error("Firebase not initialized");
-      return;
-    }
-    const docRef = doc(window.db, "homepage", TASKS_DOC);
+    const docRef = doc(db, "homepage", TASKS_DOC);
     let isFirstLoad = true;
+
     onSnapshot(
       docRef,
       (docSnap) => {
@@ -72,22 +100,23 @@ async function loadTasks() {
           tasks = data.tasks || [];
           console.log("Tasks loaded from Firebase:", tasks.length);
         } else {
-          console.log("No tasks found, starting fresh");
+          console.log("No tasks found in Firebase, starting empty.");
           tasks = [];
         }
         renderTasks();
+
         if (isFirstLoad) {
           checkAutoReset();
           isFirstLoad = false;
         }
       },
       (error) => {
-        console.error("Error in snapshot listener:", error);
+        console.error("Firestore Error (likely permission):", error.code);
         loadTasksFromLocalStorage();
       },
     );
   } catch (e) {
-    console.error("Failed to load tasks from Firebase:", e);
+    console.error("Failed to setup listener:", e);
     loadTasksFromLocalStorage();
   }
 }
@@ -108,13 +137,14 @@ function loadTasksFromLocalStorage() {
 }
 
 async function saveTasks() {
+  if (!auth.currentUser) {
+    console.warn("User not logged in, saving to LocalStorage only.");
+    saveTasksToLocalStorage();
+    return;
+  }
+
   try {
-    if (!window.db) {
-      console.error("Firebase not initialized, saving to localStorage");
-      saveTasksToLocalStorage();
-      return;
-    }
-    const docRef = doc(window.db, "homepage", TASKS_DOC);
+    const docRef = doc(db, "homepage", TASKS_DOC);
     await setDoc(docRef, {
       tasks: tasks,
       lastUpdated: new Date().toISOString(),
@@ -130,10 +160,10 @@ async function saveTasks() {
 
 function saveTasksToLocalStorage() {
   localStorage.setItem("homepage-tasks", JSON.stringify(tasks));
-  console.log("Tasks saved to localStorage (backup)");
 }
 
 function renderTasks() {
+  if (!taskListEl) return;
   taskListEl.innerHTML = "";
   tasks.forEach((task) => {
     const item = document.createElement("div");
@@ -170,59 +200,63 @@ function renderTasks() {
 }
 
 function updateProgressBar() {
+  if (!bar) return;
   const total = tasks.length;
   const done = tasks.filter((t) => t.checked).length;
   bar.style.width = total === 0 ? "0%" : (done / total) * 100 + "%";
 }
 
-function showModal() {
-  modalOverlay.classList.add("active");
-  document.getElementById("taskName").focus();
-}
-
-function hideModal() {
-  modalOverlay.classList.remove("active");
-  taskForm.reset();
-}
-
-function addNewTask() {
-  showModal();
-}
-
-taskForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const name = document.getElementById("taskName").value.trim();
-  const url = document.getElementById("taskUrl").value.trim();
-  const iconUrl = document.getElementById("taskIcon").value.trim();
-  if (!name || !url) return;
-  let domain = "";
-  try {
-    domain = new URL(url).hostname;
-  } catch (e) {
-    domain = "google.com";
+if (taskForm) {
+  function showModal() {
+    modalOverlay.classList.add("active");
+    document.getElementById("taskName").focus();
   }
-  const icon =
-    iconUrl || `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-  const newTask = {
-    id: Date.now().toString(),
-    name,
-    url,
-    icon,
-    checked: false,
-  };
-  tasks.push(newTask);
-  saveTasks();
-  hideModal();
-});
 
-modalClose.addEventListener("click", hideModal);
-btnCancel.addEventListener("click", hideModal);
-modalOverlay.addEventListener("click", (e) => {
-  if (e.target === modalOverlay) hideModal();
-});
+  function hideModal() {
+    modalOverlay.classList.remove("active");
+    taskForm.reset();
+  }
 
-if (btnAdd) {
-  btnAdd.addEventListener("click", addNewTask);
+  function addNewTask() {
+    showModal();
+  }
+
+  taskForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("taskName").value.trim();
+    const url = document.getElementById("taskUrl").value.trim();
+    const iconUrl = document.getElementById("taskIcon").value.trim();
+    if (!name || !url) return;
+    let domain = "";
+    try {
+      domain = new URL(url).hostname;
+    } catch (e) {
+      domain = "google.com";
+    }
+    const icon =
+      iconUrl || `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+    const newTask = {
+      id: Date.now().toString(),
+      name,
+      url,
+      icon,
+      checked: false,
+    };
+    tasks.push(newTask);
+    saveTasks();
+    hideModal();
+  });
+
+  if (modalClose) modalClose.addEventListener("click", hideModal);
+  if (btnCancel) btnCancel.addEventListener("click", hideModal);
+  if (modalOverlay)
+    modalOverlay.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) hideModal();
+    });
+
+  if (btnAdd) {
+    btnAdd.addEventListener("click", addNewTask);
+  }
 }
 
 function deleteTask(idToDelete) {
@@ -253,26 +287,20 @@ function checkAutoReset() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  setTimeout(() => {
-    updateClock();
-    setInterval(updateClock, 1000);
-    setInterval(checkAutoReset, 60000);
+  updateClock();
+  setInterval(updateClock, 1000);
+  setInterval(checkAutoReset, 60000);
 
-    if (window.auth) {
-      onAuthStateChanged(window.auth, async (user) => {
-        if (user) {
-          console.log("User logged in:", user.email);
-          await loadTasks();
-        } else {
-          console.log("User not logged in. Prompting sign in...");
-          try {
-            await window.signInWithPopup(window.auth, window.provider);
-          } catch (error) {
-            console.error("Login failed", error);
-            alert("Authentication required to save data.");
-          }
-        }
-      });
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      console.log("✅ User logged in:", user.email);
+      await loadTasks();
+    } else {
+      console.log("⚠️ User NOT logged in. Showing local data only.");
+      console.log(
+        "👉 Run 'await window.signInWithPopup(window.auth, window.provider)' in console to login.",
+      );
+      loadTasksFromLocalStorage();
     }
-  }, 500);
+  });
 });

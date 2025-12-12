@@ -153,26 +153,6 @@
       </div>
     </div>
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-      import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-      import {
-        getAuth,
-        GoogleAuthProvider,
-        signInWithPopup,
-      } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyB0GrHzgKBy6hp4yJagm-oBak3I0-UdyuA",
-      };
-
-      const app = initializeApp(firebaseConfig);
-      window.db = getFirestore(app);
-      window.auth = getAuth(app);
-      window.provider = new GoogleAuthProvider();
-      window.signInWithPopup = signInWithPopup;
-    </script>
-
     <script type="module" src="js/script.js"></script>
   </body>
 </html>
