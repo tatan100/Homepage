@@ -638,3 +638,9 @@ input[type="checkbox"]:checked::after {
 .task-item:active {
   cursor: grabbing;
 }
+
+.task-item * {
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+}

@@ -129,8 +129,9 @@ function renderTasks() {
     item.setAttribute("data-id", task.id);
     item.innerHTML = `
             <div class="task-left">
+                <span class="drag-handle" style="cursor: grab; padding-right: 8px; color: #666;">⋮⋮</span>
                 <img src="${task.icon}" class="task-icon" onerror="this.src='https://www.google.com/s2/favicons?domain=example.com&sz=32'">
-                <a href="${task.url}" class="task-link" target="_blank">${task.name}</a>
+                <a href="${task.url}" class="task-link" target="_blank" draggable="false">${task.name}</a>
             </div>
             <div class="task-actions">
                 <input type="checkbox" ${task.checked ? "checked" : ""}>
@@ -321,6 +322,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     new Sortable(taskListEl, {
       animation: 150,
       ghostClass: "sortable-ghost",
+      handle: ".drag-handle",
       onEnd: function (evt) {
         const itemEls = taskListEl.querySelectorAll(".task-item");
         const newOrderIds = Array.from(itemEls).map((el) =>
