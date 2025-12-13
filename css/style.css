@@ -625,22 +625,3 @@ input[type="checkbox"]:checked::after {
 .task-actions .btn-delete {
   display: none;
 }
-
-.sortable-ghost {
-  opacity: 0.4;
-  background: #2b2d31;
-}
-
-.task-item {
-  cursor: grab;
-}
-
-.task-item:active {
-  cursor: grabbing;
-}
-
-.task-item * {
-  -webkit-user-drag: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
