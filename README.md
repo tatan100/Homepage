@@ -24,7 +24,7 @@ This homepage is pure static HTML + Firebase. No installation needed:
 2. **Setup Firebase** (free!)
    - Create a project at [Firebase Console](https://console.firebase.google.com)
    - Enable Firestore Database
-   - Copy the config to `index.html`
+   - Copy the config to `js/script.js`
    - Set up Security Rules (so only you can edit)
 
 3. **Deploy to GitHub Pages**
@@ -46,7 +46,8 @@ assets/         → Preview screenshot
 
 - **Add task:** Click the `+` button in the top-right
 - **Check task:** Click checkbox (auto-saves to Firebase)
-- **Delete task:** Click the 🗑️ icon
+- **Edit task:** Right-click > Edit task
+- **Delete task:** Right-click > Delete task
 - **Search:** Type in the search bar, hit Enter
 - **Shortcuts:** Just click them
 - **Reset tasks:** Auto-resets at 7 AM, or click "Uncheck everything"
